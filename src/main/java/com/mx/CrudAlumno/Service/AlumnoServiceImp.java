@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.mx.CrudAlumno.DAO.IAlumnoDao;
 import com.mx.CrudAlumno.Dominio.Alumno;
+import com.mx.CrudAlumno.Dominio.Carrera;
 
 @Service
 public class AlumnoServiceImp implements IMetodos<Alumno>{
@@ -44,7 +45,24 @@ public class AlumnoServiceImp implements IMetodos<Alumno>{
 		// TODO Auto-generated method stub
 		return dao.findById(entidad.getIdAlumno()).orElse(null);
 	}
+
+	public List<Alumno> porCarreraId(Carrera carreraId) {
+		return dao.findByCarreraId(carreraId);
+	}
+	/*
+	 * //buscra nombre y apellido
+	public Padre porNombreYApellido(String nombre, String apellido) {
+		return dao.findByNombreIgnoringCaseContainingAndApellidoIgnoringCaseContaining(nombre, apellido);
+	}
+	
+	 */
+		public Alumno porNombreYApellido(String nombre, String apellido) {
+			return dao.findByNombreIgnoringCaseContainingAndApellidoIgnoringCaseContaining(nombre, apellido);
+		}
+		
+		
+}
 	
 	
 
-}
+

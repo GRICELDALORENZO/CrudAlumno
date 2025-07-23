@@ -3,6 +3,8 @@ package com.mx.CrudAlumno.Dominio;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.antlr.v4.runtime.misc.NotNull;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -58,6 +60,7 @@ public class Carrera {
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
+
 	
 	
 }

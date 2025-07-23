@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mx.CrudAlumno.Dominio.Alumno;
+import com.mx.CrudAlumno.Dominio.Carrera;
 import com.mx.CrudAlumno.Service.AlumnoServiceImp;
+import com.mx.CrudAlumno.Service.CarreraServiceImp;
 
 @RestController
 @RequestMapping(path = "api/alumno")
@@ -29,23 +31,39 @@ public class AlumnoWS {
 	@GetMapping(path = "/listar")
 	public ResponseEntity<?> listar() {
 		List<Alumno> alumnos = service.listar();
+		
 		if (alumnos.isEmpty()) {
 			return ResponseEntity.noContent().build();
-		} else {
+		} 
+		else {
 			return ResponseEntity.ok(alumnos);
 		}
 
 	}
-
+	@Autowired
+    private CarreraServiceImp  servCarrera;
+    
 	// guardar ------> http://localhost:8002/api/alumno/guardar
 	@PostMapping(path = "/guardar")
 	public ResponseEntity<?> guardar(@RequestBody Alumno a) {
 		Alumno nuevo = service.buscar(a);
-		if (nuevo == null) {
+		Carrera carrera = servCarrera.buscar(a.getCarreraId());
+		Alumno existe = service.porNombreYApellido(a.getNombre(), a.getApellido());
+		
+		if(existe != null) {
+			return ResponseEntity.status(HttpStatus.CONFLICT)
+					.body("EL ALUMNO CON EL NOMBRE " + a.getNombre() + " Y APELLIDO " +a.getApellido()+ " YA EXISTE");
+		}
+		else if (carrera == null) {
+			return ResponseEntity.status(HttpStatus.CONFLICT)
+					.body("LA CARRERA CON EL ID " + a.getCarreraId() + "NO EXISTE. NO SE ALMECENADO EL ALUMNO");
+		}
+		else if (nuevo == null) {
 			service.guardar(a);
 			return ResponseEntity.status(HttpStatus.CREATED).body("SE HA ALMACENADO EL ALUMNO " + a.getIdAlumno());
+		}
 
-		} else {
+		else {
 			return ResponseEntity.status(HttpStatus.CONFLICT)
 					.body("EL ALUMNO CON EL ID " + a.getIdAlumno() + "YA EXISTE NO SE ALMECENADO");
 		}
@@ -55,10 +73,22 @@ public class AlumnoWS {
 	@PutMapping(path = "/editar")
 	public ResponseEntity<?> editar(@RequestBody Alumno a) {
 		Alumno encontrado = service.buscar(a);
-		if (encontrado == null) {
+		Carrera carrera = servCarrera.buscar(a.getCarreraId());
+		
+		Alumno existe = service.porNombreYApellido(a.getNombre(), a.getApellido());
+		
+		if(existe != null) {
+			return ResponseEntity.status(HttpStatus.CONFLICT)
+					.body("EL ALUMNO CON EL NOMBRE " + a.getNombre() + " Y APELLIDO " +a.getApellido()+ " YA EXISTE");
+		}
+		else if (encontrado == null) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND)
 					.body("EL AlUMNO " + a.getIdAlumno() + " NO EXISTE. NO SE EDITO");
-		} else {
+		} else if (carrera == null) {
+			return ResponseEntity.status(HttpStatus.CONFLICT)
+					.body("LA CARRERA CON EL ID " + a.getCarreraId() + "NO EXISTE. NO SE ACTUALIZO EL ALUMNO");
+		}
+		else {
 			service.editar(a);
 			return ResponseEntity.status(HttpStatus.OK).body("SE HA ACTUALIZADO EL ALUMNO " + a.getIdAlumno());
 		}
@@ -68,8 +98,12 @@ public class AlumnoWS {
 	// ELIMINAR -----> http://localhost:8002/api/alumno/eliminar
 	@DeleteMapping(path = "/eliminar")
 	public ResponseEntity<?> eliminar(@RequestBody Alumno a) {
+		Alumno encontrado = service.buscar(a);
+		if(encontrado == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("EL ALUMNO CON ID " + a.getIdAlumno()+" NO EXISTE");
+		}
 		service.elimnar(a);
-		return ResponseEntity.noContent().build();
+		return ResponseEntity.status(HttpStatus.OK).body("SE ELIMINO EL ALUMNO CON ID " + a.getIdAlumno());
 	}
 
 	// BUSCAR -----> http://localhost:8002/api/alumno/buscar

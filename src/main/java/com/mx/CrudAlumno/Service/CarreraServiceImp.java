@@ -45,5 +45,17 @@ public class CarreraServiceImp implements IMetodos<Carrera>{
 		// TODO Auto-generated method stub
 		return dao.findById(entidad.getIdCarrera()).orElse(null);
 	}
-
+	
+	
+	
+	public Carrera porIdCarrera(int idCarrera) {
+		return dao.findByIdCarrera(idCarrera);
+	}
+	
+	//buscra nombre y apellido
+		public Carrera porNombre(String nombre) {
+			return dao.findByNombreIgnoringCaseContaining(nombre);
+	}
+		
+		
 }

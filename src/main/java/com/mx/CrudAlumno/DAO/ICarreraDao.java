@@ -7,5 +7,7 @@ import com.mx.CrudAlumno.Dominio.Carrera;
 
 @Repository
 public interface ICarreraDao extends JpaRepository<Carrera, Integer> {
-
+ 
+	Carrera findByIdCarrera(int idCarrera);
+	Carrera findByNombreIgnoringCaseContaining(String nombre);
 }
